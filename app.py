@@ -146,7 +146,7 @@ return {cx: Math.round(hr.x + 30), cy: Math.round(hr.y + hr.height / 2)};
 """
 
 # Turnstile 脚本异步渲染，轮询等待组件出现
-def wait_turnstile_present(sb, timeout=12):
+def wait_turnstile_present(sb, timeout=30):
     deadline = time.time() + timeout
     while time.time() < deadline:
         if js(sb, TURNSTILE_EXISTS_JS, False):
@@ -201,7 +201,7 @@ def turnstile_token(sb) -> str:
     token = js(sb, TURNSTILE_TOKEN_JS, "")
     return token if isinstance(token, str) else ""
 
-def _click_turnstile(sb, locate_timeout=10) -> bool:
+def _click_turnstile(sb, locate_timeout=20) -> bool:
     coords = None
     errors = []
     deadline = time.time() + locate_timeout
@@ -253,7 +253,7 @@ def click_turnstile(sb) -> bool:
         print(f"⚠️ click_captcha 出错: {e}")
     return False
 
-def solve_turnstile(sb, timeout=90, tag="Turnstile", first_wait=8) -> bool:
+def solve_turnstile(sb, timeout=180, tag="Turnstile", first_wait=8) -> bool:
     if turnstile_token(sb):
         return True
 
@@ -276,7 +276,7 @@ def solve_turnstile(sb, timeout=90, tag="Turnstile", first_wait=8) -> bool:
 
 def handle_turnstile(sb) -> bool:
     print("🛡️ 处理 Turnstile 验证...")
-    return solve_turnstile(sb, timeout=90, tag="Turnstile", first_wait=8)
+    return solve_turnstile(sb, timeout=180, tag="Turnstile", first_wait=8)
     
 # 获取当前出口ip
 def get_current_ip(proxy_server: str = "") -> str:
@@ -376,7 +376,7 @@ def main():
                 sb.wait_for_ready_state_complete()
                 sb.sleep(3)
                 sb.click('button[type="submit"]') # 点击 Continue with email 按钮
-                sb.sleep(12)  # 等待页面加载
+                sb.sleep(20)  # 等待页面加载
                 print(f"📧 填写邮箱...")
                 sb.input('input[type="email"]', EMAIL)
                 sb.sleep(1)
@@ -463,7 +463,7 @@ def main():
             try:
                 sb.sleep(2)
                 sb.click(outer_renew_selector)
-                sb.sleep(15)  # 等待模态框加载，可能因网络因素加载慢
+                sb.sleep(30)  # 等待模态框加载，可能因网络因素加载慢
             except Exception as e:
                 print(f"❌ 点击外部按钮失败: {e}")
                 send_telegram_message(format_notification("❌ 续期失败", error="点击外部续期按钮出错"))
